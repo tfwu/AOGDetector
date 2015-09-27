@@ -11,10 +11,9 @@ Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <
         Xi Song                          <xsong.lhi@gmail.com> (object detection module)                       
         Bo Li                            <boli.lhi@gmail.com>  (occlusion module)                     
 
+Code Release Log
 
-    Code Release Log
-
-10-14-2014: Release detection code  (full code will be released in future)                    
+     10-14-2014: Release detection code  (full code will be released in future)                    
 
 
                        MODULE 1: object detection 
