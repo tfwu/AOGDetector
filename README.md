@@ -10,7 +10,7 @@
         "Integrating Context and Occlusion for Car Detection by Hierarchical And-Or Model"
         ECCV, 2014
 
-Copyright (c) 2014 Center for Vision, Cognition, Learning and Art at UCLA <http://vcla.stat.ucla.edu/>
+Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <http://vcla.stat.ucla.edu/>
             Written by Matt Tianfu Wu (primary contact) <tfwu@stat.ucla.edu> 
                        Xi Song                          <xsong.lhi@gmail.com> (object detection module)                       
                        Bo Li                            <boli.lhi@gmail.com>  (occlusion module)                     
