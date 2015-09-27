@@ -7,6 +7,7 @@
         Tianfu Wu, Bo Li and Song-Chun Zhu, "Learning And-Or Models to Represent Context and Occlusion for Car Detection and Viewpoint Estimation",  arXiv 1501.07359, TPAMI(under major revision), 2015
 
 Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <http://vcla.stat.ucla.edu/>,
+        
         Written by Matt Tianfu Wu (primary contact) <tfwu@stat.ucla.edu>,  
         Xi Song                          <xsong.lhi@gmail.com> (object detection module),                        
         Bo Li                            <boli.lhi@gmail.com>  (occlusion module),                      
