@@ -19,12 +19,12 @@ Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <
 ## MODULE 1: object detection 
 
 ### VOC Configuration
-  >All the configuration can be specified in voc_config.xml in "<PATH_TO_RGM_Source_Code>/config" folder.
+  > All the configuration can be specified in voc_config.xml in "<PATH_TO_RGM_Source_Code>/config" folder.
 
 ### VOC Testing
-  >Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
-  >Run:   Entry vocEval <PATH_To_voc_config_xml>,
-  >e.g.,  Entry vocEval /home/tfwu/Code/RGM/config/voc_config.xml
+  > Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
+  > Run:   Entry vocEval <PATH_To_voc_config_xml>,
+  > e.g.,  Entry vocEval /home/tfwu/Code/RGM/config/voc_config.xml
 
 ### DetectionInASingleImage
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
