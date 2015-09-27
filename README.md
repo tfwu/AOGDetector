@@ -1,5 +1,5 @@
 # AOGDetector
-                          ## Implementation of the papers
+                          Implementation of the papers
 
         "Discriminatively Trained And-Or Tree Model for Object Detection"
         CVPR, 2013.        
@@ -23,30 +23,25 @@ Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <
 
                        MODULE 1: object detection 
 
-VOC Configuration
+      VOC Configuration
   All the configuration can be specified in voc_config.xml in "<PATH_TO_RGM_Source_Code>/config" folder.
 
-VOC Training (to be available soon...)
-  Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built
-  Run:   Entry vocTrain <PATH_To_voc_config_xml>
-  e.g.,  Entry vocTrain /home/tfwu/Code/RGM/config/voc_config.xml
-
-VOC Testing
+      VOC Testing
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built
   Run:   Entry vocEval <PATH_To_voc_config_xml>
   e.g.,  Entry vocEval /home/tfwu/Code/RGM/config/voc_config.xml
 
-DetectionInASingleImage
+     DetectionInASingleImage
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built
   Run:   Entry detect <PATH_To_voc_config_xml> 
   e.g.,  Entry detect /home/tfwu/Code/RGM/config/voc_config.xml
 
-BatchDetectionInDirectory
+     BatchDetectionInDirectory
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built
   Run:   Entry detectBatch <PATH_To_voc_config_xml> 
   e.g.,  Entry detectBatch /home/tfwu/Code/RGM/config/voc_config.xml  
 
-ConvertVOCRel5Model
+     ConvertVOCRel5Model
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built
   Run:   Entry cvtVOCRel5Model <PATH_To_VOCRel5_Model_Mat_File> 
   e.g.,  Entry cvtVOCRel5Model /home/tfwu/Code/RGM/externalModels/VOC2007/bicycle_final.mat
