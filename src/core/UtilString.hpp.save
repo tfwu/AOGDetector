@@ -1,0 +1,23 @@
+#ifndef RGM_UTILSTRING_HPP_
+#define RGM_UTILSTRING_HPP_
+
+#include <string>
+#include <vecto
+
+namespace RGM
+{
+
+class StringUtil
+{
+public:
+    /// Convert number to string
+    template<class T>
+    static inline std::string NumToString_(const T& t, int zeroPaddingLen=0);
+
+    static void TokenizeString(std::string str, char delimeter, std::vector<std::string>& tokens);
+
+}; // class StringUtil
+
+} // namespace RGM
+
+#endif // RGM_UTILSTRING_HPP_

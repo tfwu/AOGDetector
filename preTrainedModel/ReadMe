@@ -1,0 +1,13 @@
+This directory includes some pre-trained models.
+
+-- car:  different models presented in our ECCV2014 paper, "Integrating Context and Occlusion for Car Detection by Hierarchical And-Or Model".
+
+         Parking_Lot Dataset: please download it from http://www.stat.ucla.edu/~tfwu/publication/parking_lot_release.zip
+         Street_Parking Dataset: please download it from http://www.stat.ucla.edu/~tfwu/publication/street-parking-release.zip
+
+-- voc2007_RGM: models presented in our CVPR2013 paper, "Discriminatively Trained And-Or Tree Model for Object Detection".
+                              Note: these models did not train bounding box prediction model. 
+
+All these pretrained models are just for demostration. The training code will be release soon.
+
+Any comments and suggestions will be greatly appreciated and please feel free to contact with Matt Tianfu Wu (tfwu@stat.ucla.edu)

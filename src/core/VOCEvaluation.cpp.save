@@ -1,0 +1,416 @@
+#include <fstream>
+#include <boost/serialization/vector.hpp
+
+#include "VOCEvaluation.hpp"
+#include "UtilString.hpp"
+#include "Inference.hpp"
+
+
+namespace RGM
+{
+
+VOCEvaluation::VOCEvaluation(std::string & configFile, bool testImg)
+{
+    env_.InitFromConfigFile(configFile);
+    XMLData* config = env_.GetConfig();
+
+    if ( testImg ) {
+        detect(config);
+    } else {
+        voc_.read(config);
+        data_.setVOCConfig(voc_);
+
+        if ( voc_.applyPolicy_ ) {
+            evalPolicy();
+        } else {
+            evalDP();
+        }
+    }
+}
+
+void VOCEvaluation::evalDP()
+{
+    const std::vector<std::string>& objs = voc_.ObjectCategories_;
+
+    Inference::Param inferenceParam;
+
+    for ( int i=0; i<objs.size(); ++i ) {
+        // Current obj. cat.
+        voc_.curObjectIndex_ = i;
+        const std::string & objName = voc_.ObjectCategory();
+
+        // check if it is already done
+        std::string resultName = voc_.cacheDir_ + "comp3_det_val_" + objName + ".txt";
+        if (FileUtil::exists(resultName)) {
+            printf("Testing: %s is already done\n", objName.c_str());
+            continue;
+        }
+
+        std::string resultNameBin = voc_.cacheDir_ + "comp3_det_val_" + objName + "_boxes.bin";
+        if (!loadParseTrees(resultNameBin)) {
+            std::string modelName;
+            if ( voc_.partConfig_ == VOCConfig::GREEDY_PURSUIT ) {
+                modelName = std::string(objName+"_DPM_final.bin");
+            } else {
+                modelName = std::string(objName+"_RGM_final.bin");
+            }
+
+            // Check if it is trained already
+            std::string modelFile = voc_.cacheDir_ + modelName;
+            if ( !grammar_.read(modelFile) ) {
+                continue;
+            }
+
+            if ( !data_.prepareTestData(objName) ) {
+                continue;
+            }
+
+            const std::vector<std::string>  & imgFiles = data_.testImgFiles();
+            int numImgs = imgFiles.size();
+            if (numImgs==0) {
+                continue;
+            }
+
+            int maxHt = (data_.maxHeight() + grammar_.minCellSize() - 1) / grammar_.minCellSize() + grammar_.pady();
+            int maxWd = (data_.maxWidth()  + grammar_.minCellSize() - 1) / grammar_.minCellSize() + grammar_.padx();
+
+            if (!Patchwork::InitFFTW((maxHt + 15) & ~15, (maxWd + 15) & ~15)) {
+                printf("Error: Could not initialize the Patchwork class\n");
+                return;
+            }
+
+            // evaluation setting
+            grammar_.getInterval() = voc_.interval_;
+            Scalar thresh = std::min(voc_.maxThreshold_, grammar_.thresh());
+            inferenceParam.useNMS_ = true;
+            inferenceParam.nmsOverlap_ = 0.5F;
+            inferenceParam.nmsDividedByUnion_ = false;
+
+            // cache FFT
+            grammar_.cachingFFTFilters();
+
+            allpts_.clear();
+            allpts_.resize(numImgs);
+
+            Scalar detectLimit = std::numeric_limits<Scalar>::infinity();
+
+            #pragma omp parallel for
+            for (int j = 0; j < numImgs; ++j ) {
+                cv::Mat img;
+                #pragma omp critical
+                {
+                    img = cv::imread(imgFiles[j], 1);
+                }
+
+                FeaturePyramid pyr(img, grammar_.cellSize(), grammar_.padx(), grammar_.pady(),
+                                   0, grammar_.interval(), grammar_.extraOctave());
+                if (pyr.empty()) {
+                    continue;
+                }
+
+                Inference inference(grammar_, inferenceParam);
+
+                inference.runDetection(thresh, pyr, detectLimit, allpts_[j]);
+
+                #pragma omp critical
+                {
+                    printf("testing %d (%d) ... done.\n", j+1, numImgs);
+                }
+            } // for j
+
+            // save
+            saveParseTrees(resultNameBin);
+        } else {
+            if ( !data_.prepareTestData(objName) ) {
+                continue;
+            }
+        }
+
+        // write detection resutls for evaluationg AP using PASCAL VOCdevit
+        FILE * f = fopen(resultName.c_str(), "w");
+        if (f == NULL) {
+            printf("can not write result to %s\n", resultName.c_str());
+            return;
+        }
+
+        const std::vector<std::string>  & imgFiles = data_.testImgFiles();
+
+        for ( int j = 0; j < allpts_.size();  ++j ) {
+            std::string imageBaseName = FileUtil::GetFileBaseName(imgFiles[j]);
+            std::vector<ParseTree> & pts(allpts_[j]);
+            for ( int k = 0; k < pts.size(); ++k ) {
+                const ParseInfo * info = pts[k].rootNode()->parseInfo(&pts[k]);
+                fprintf(f, "%s %f %f %f %f %f\n", // imageName, score, x1, y1, x2, y2
+                        imageBaseName.c_str(),
+                        info->score_, info->left(), info->top(), info->right(), info->bottom() );
+            } // for k
+        } // for j
+
+        fclose(f);
+
+    } // for i
+}
+
+void VOCEvaluation::evalPolicy()
+{
+//    const std::vector<std::string>& objs = voc_.ObjectCategories_;
+//
+//    for ( int i=0; i<objs.size(); ++i ) {
+//        // Current obj. cat.
+//        voc_.curObjectIndex_ = i;
+//        const std::string & objName = voc_.ObjectCategory();
+//
+//        // check if it is already done
+//        std::string resultName = voc_.cacheDir_ + "comp3_det_val_" + objName + "_policy.txt";
+//        if (FileUtil::exists(resultName)) {
+//            printf("Testing: %s is already done\n", objName.c_str());
+//            continue;
+//        }
+//
+//        std::string resultNameBin = voc_.cacheDir_ + "comp3_det_val_" + objName + "_boxes_policy.bin";
+//        if (!loadDetections(resultNameBin)) {
+//            const std::string modelName = std::string(objName+"_"+StringUtil::NumToString_<DecisionPolicy::Scalar>(voc_.policyFinalThresh_) +"_policy.bin");
+//
+//            // Check if it is trained already
+//            std::string modelFile = voc_.cacheDir_ + modelName;
+//            if ( !policy_.read(modelFile) ) {
+//                continue;
+//            }
+//
+//            if ( !data_.prepareTestData(objName) ) {
+//                continue;
+//            }
+//
+//            const std::vector<std::string>  & imgFiles = data_.testImgFiles();
+//            int numImgs = imgFiles.size();
+//            if (numImgs==0) {
+//                continue;
+//            }
+//
+//            int maxHt = (data_.maxHeight() + policy_.minCellSize() - 1) / policy_.minCellSize() + policy_.pady();
+//            int maxWd = (data_.maxWidth()  + policy_.minCellSize() - 1) / policy_.minCellSize() + policy_.padx();
+//
+//            if (!Patchwork::InitFFTW((maxHt + 15) & ~15, (maxWd + 15) & ~15, 1)) {
+//                printf("Error: Could not initialize the Patchwork class\n");
+//                return;
+//            }
+//
+//            // evaluation setting
+//            policy_.getInterval() = voc_.interval_;
+//            AOGrammar::Scalar thresh = std::min(voc_.maxThreshold_, policy_.thresh());
+//            policy_.getUseNMS() = true;
+//            policy_.getNmsOverlap() = 0.5F;
+//            policy_.getNmsDividedByUnion() = false;
+//
+//            // cache FFT
+//            policy_.cachingFFTFilters();
+//
+//            allDets_.clear();
+//            allDets_.resize(numImgs);
+//
+//            #pragma omp parallel for
+//            for (int j = 0; j < numImgs; ++j ) {
+//                cv::Mat img;
+//                #pragma omp critical
+//                {
+//                    img = cv::imread(imgFiles[j], 1);
+//                }
+//
+//                DecisionPolicy p(policy_);
+//
+//                p.runDetection(thresh, img, allDets_[j]);
+//
+//                #pragma omp critical
+//                {
+//                    printf("testing %d (%d) ... done.\n", j+1, numImgs);
+//                }
+//            } // for j
+//
+//            // save
+//            saveDetections(resultNameBin);
+//        } else {
+//            if ( !data_.prepareTestData(objName) ) {
+//                continue;
+//            }
+//        }
+//
+//        // write detection resutls for evaluationg AP using PASCAL VOCdevit
+//        FILE * f = fopen(resultName.c_str(), "w");
+//        if (f == NULL) {
+//            printf("can not write result to %s\n", resultName.c_str());
+//            return;
+//        }
+//
+//        const std::vector<std::string>  & imgFiles = data_.testImgFiles();
+//
+//        for ( int j = 0; j < allpts_.size();  ++j ) {
+//            std::string imageBaseName = FileUtil::GetFileBaseName(imgFiles[j]);
+//            std::vector<Detection> & dets = allDets_[j];
+//            for ( int k = 0; k < dets.size(); ++k ) {
+//                fprintf(f, "%s %f %f %f %f %f\n", // imageName, score, x1, y1, x2, y2
+//                        imageBaseName.c_str(),
+//                        dets[k].parts_[0].left(), dets[k].parts_[0].top(), dets[k].parts_[0].right(), dets[k].parts_[0].bottom() );
+//            } // for k
+//        } // for j
+//
+//        fclose(f);
+//
+//    } // for i
+}
+
+void VOCEvaluation::detect(XMLData* config)
+{
+    if ( config == NULL ) {
+        std::cout << "No configuration data specified" << std::endl;
+        return;
+    }
+
+    std::string modelFile = config->GetString("TestImage/ModelFile");
+    bool isGrammar        = config->GetBoolean("TestImage/IsGrammarOrPolicy");
+    float thresh          = config->GetFloat("TestImage/Threshold");
+    int interval          = config->GetInt("TestImage/Interval");
+    std::string imgFile   = config->GetString("TestImage/ImageFile");
+
+    cv::Mat img = cv::imread(imgFile, cv::IMREAD_COLOR);
+    if ( img.empty() ) {
+        std::cout << "Can not open image " << imgFile << std::endl;
+        return;
+    }
+
+    if ( isGrammar && grammar_.read(modelFile) ) {
+        // Init FFTW
+        int maxHt = (img.rows + grammar_.minCellSize() - 1) / grammar_.minCellSize() + grammar_.pady();
+        int maxWd = (img.cols + grammar_.minCellSize() - 1) / grammar_.minCellSize() + grammar_.padx();
+
+        if (!Patchwork::InitFFTW((maxHt + 15) & ~15, (maxWd + 15) & ~15)) {
+            std::cout << "Could not initialize the Patchwork class." << std::endl;
+            return;
+        }
+
+        grammar_.getInterval() = interval;
+        grammar_.getCachedFFTStatus() = false;
+
+        Inference::Param inferenceParam;
+        inferenceParam.useNMS_ = true;
+        inferenceParam.nmsOverlap_ = 0.5F;
+        inferenceParam.nmsDividedByUnion_ = false;
+
+        thresh = std::max(grammar_.thresh(), thresh);
+        Scalar maxNum = 100;
+        std::vector<ParseTree> pts;
+
+        Inference inference(grammar_, inferenceParam);
+
+        inference.runDetection(thresh, img, maxNum, pts);
+
+        for ( int i = 0; i < pts.size(); ++i ) {
+            pts[i].showDetection(img, true);
+        }
+
+    }
+
+//    if (!isGrammar && policy_.read(modelFile) ) {
+//        int maxHt = (img.rows  + policy_.minCellSize() - 1) / policy_.minCellSize() + policy_.pady();
+//        int maxWd = (img.cols  + policy_.minCellSize() - 1) / policy_.minCellSize() + policy_.padx();
+//
+//        if (!Patchwork::InitFFTW((maxHt + 15) & ~15, (maxWd + 15) & ~15, 1)) {
+//            printf("Error: Could not initialize the Patchwork class\n");
+//            return;
+//        }
+//
+//        // evaluation setting
+//        policy_.getInterval() = interval;
+//        thresh = std::max(policy_.thresh(), thresh);
+//        policy_.getUseNMS() = true;
+//        policy_.getNmsOverlap() = 0.5F;
+//        policy_.getNmsDividedByUnion() = false;
+//        policy_.getCachedFFTStatus() = false;
+//
+//        std::vector<Detection> results;
+//
+//        policy_.runDetection(thresh, img, results);
+//
+//        for ( int i = 0; i < results.size(); ++i ) {
+//            results[i].show(img);
+//        }
+//    }
+
+}
+
+void VOCEvaluation::saveParseTrees(const std::string & fileName)
+{
+    std::ofstream out;
+    out.open(fileName.c_str(), std::ios::out | std::ios::binary );
+    if ( !out.is_open() ) {
+        std::cerr << "Failed to write to file " << fileName << std::endl;
+        return;
+    }
+
+    boost::archive::binary_oarchive oa(out);
+
+    oa << allpts_;
+}
+
+bool VOCEvaluation::loadParseTrees(const std::string & fileName)
+{
+    std::ifstream in;
+    in.open(fileName.c_str(), std::ios::in | std::ios::binary );
+    if ( !in.is_open() ) {
+        std::cerr << "Failed to read file " << fileName << std::endl;
+        return false;
+    }
+
+    allpts_.clear();
+
+    boost::archive::binary_iarchive ia(in);
+
+    in >> allpts_;
+
+    return true;
+}
+
+void VOCEvaluation::saveDetections(const std::string & fileName)
+{
+//    std::ofstream out;
+//    out.open(fileName.c_str(), std::ios::out | std::ios::binary );
+//    if ( !out.is_open() ) {
+//        std::cerr << "Failed to write to file " << fileName << std::endl;
+//        return;
+//    }
+//
+//    int num = allDets_.size();
+//    out.write(reinterpret_cast<const char *>(&num), sizeof(int));
+//
+//    for ( int i = 0; i < num; ++i ) {
+//        out << allDets_[i];
+//    }
+//
+//    out.close();
+}
+
+bool VOCEvaluation::loadDetections(const std::string & fileName)
+{
+//    std::ifstream in;
+//    in.open(fileName.c_str(), std::ios::in | std::ios::binary );
+//    if ( !in.is_open() ) {
+//        std::cerr << "Failed to read file " << fileName << std::endl;
+//        return false;
+//    }
+//
+//    allDets_.clear();
+//
+//    int num = 0;
+//    in.read(reinterpret_cast<char *>(&num), sizeof(int));
+//
+//    allDets_.resize(num);
+//
+//    for ( int i = 0; i < num; ++i ) {
+//        in >> allDets_[i];
+//    }
+//
+//    in.close();
+
+    return true;
+}
+
+} // namespace RGM

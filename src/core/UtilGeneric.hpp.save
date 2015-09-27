@@ -1,0 +1,22 @@
+#ifndef RGM_UTILGENERIC_HPP_
+#define RGM_UTILGENERIC_HPP_
+
+#include <vector>
+
+namespace RGM
+{
+
+// Fci - forward const iterator
+template<typename Fci>
+static std::vector<std::vector<Fci> > enumerateCombinations_(Fci begin,
+        Fci end, unsigned int combination_size);
+
+template<typename T>
+std::vector<T> & operator+=(std::vector<T> & a, const std::vector<T> & b);
+
+ template <typename T>
+    static void uniqueVector_(std::vector<T> & vec);
+
+} // namespace RGM
+
+#endif // RGM_UTILGENERIC_HPP_

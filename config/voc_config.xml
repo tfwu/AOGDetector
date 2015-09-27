@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- "PASCAL VOC 20 Object Classes" configuration file -->
+
+<Configuration>
+
+  <!-- Directories -->
+  <Paths>	
+    <VOCdevkitDir>/home/tfwu/Data/VOC2007/VOCdevkit/</VOCdevkitDir>
+    <OutputDir>/home/tfwu/Results/</OutputDir>   
+  </Paths>
+  
+  <!-- PASCAL VOC -->
+  <PASCALVOC>
+    <!-- use + as delimeter, e.g., car+bicycle+car+aeroplane+boat+bus+bird+cat+chair+cow -->
+  <ObjectCategories>car+bicycle+aeroplane+boat+bus+bird+cat+chair+cow</ObjectCategories>		
+	<Year>2007</Year>
+	<TrainSetFg>trainval</TrainSetFg>
+	<TrainSetBg>train</TrainSetBg>
+	<TestSet>test</TestSet>	
+	<Project>RGM</Project>
+	<Note>TestRGM</Note>
+  </PASCALVOC>
+ 
+  <!-- Testing settings -->
+  <TestParam>
+	<Interval>10</Interval>
+	<MaxThreshold>-1.1</MaxThreshold>	
+  </TestParam>  
+  
+  <!-- Run detection in a single image -->
+  <TestImage>
+	<ModelFile>/home/tfwu/CodeRelease/RGM-release1/preTrainedModel/car/parking_lot/car_aog_final.bin</ModelFile>	
+	<Threshold>0.5</Threshold>
+	<Interval>10</Interval>
+	<ImageFile>/home/tfwu/CodeRelease/RGM-release1/data/00002.jpg</ImageFile>
+  </TestImage>
+
+  <!-- Run detections for all images in a directory -->
+  <TestBatchImage>
+  <ModelFile>/home/tfwu/CodeRelease/RGM-release1/preTrainedModel/car/parking_lot/car_aog_final.bin</ModelFile>	
+	<Threshold>-1.1</Threshold>
+	<Interval>10</Interval>
+	<ImageDir>/home/tfwu/Tmp/dataset/parking_lot_release/test/</ImageDir>
+	<ImageExtName>.jpg</ImageExtName>
+	<!-- maximum of the size of input images used to initialize the FFTW, if not specified (i.e. <= 0) the code will check it out -->
+	<maxImageWidth>0</maxImageWidth>
+	<maxImageHeight>0</maxImageHeight>	
+  <!-- num. of threads used in open mp, use small value if there are big images -->  
+  <numThread>1</numThread>
+  </TestBatchImage>
+
+</Configuration>
+
+
+
+
+
+

@@ -1,0 +1,56 @@
+#ifndef RGM_VOCEVALUATION_HPP_
+#define RGM_VOCEVALUATION_HPP_
+
+#include "Environment.hpp"
+#include "VOCData.hpp"
+#include "AOGrammar.hpp"
+#include "ParseTree.hpp"
+
+namespace RGM
+{
+/// The VOCEvaluation class
+class VOCEvaluation
+{
+public:
+    /// Constructs the evaluation with given configuration file
+    VOCEvaluation(std::string & configFile, bool testImg=false);
+
+    /// Evaluation using DP detection
+    void evalDP();
+
+    /// Evaluation using policy detection
+    void evalPolicy();
+
+    /// Run detection in a testing image
+    void detect(XMLData* config);
+
+    /// Loads the parse trees
+    void saveParseTrees(const std::string & fileName);
+
+    /// Loads the parse trees
+    bool loadParseTrees(const std::string & fileName);
+
+    /// Loads the detections
+    void saveDetections(const std::string & fileName);
+
+    /// Loads the detections
+    bool loadDetections(const std::string & fileName);
+
+private:
+    std::string configFile_;
+
+    Environment env_;
+    VOCConfig   voc_;
+    VOCData     data_;
+
+    AOGrammar   grammar_;
+    std::vector<std::vector<ParseTree> >  allpts_;
+
+    //DecisionPolicy policy_;
+    //std::vector<std::vector<Detection> > allDets_;
+
+}; // class VOCEvaluation
+
+} // namespace RGM
+
+#endif // RGM_VOCEVALUATION_HPP_

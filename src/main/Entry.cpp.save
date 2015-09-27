@@ -1,0 +1,17 @@
+#include "Common.hpp"
+#include "CommandLine.hpp"
+
+using namespace RGM;
+
+int main(int argc, char** argv)
+{    
+    RGM::CommandLineInterpreter cli(argc, argv);
+
+    cli.AddCommand(new RGM::VOCTrainCommand());
+    cli.AddCommand(new RGM::VOCEvalCommand());
+    cli.AddCommand(new RGM::VOCCommand());
+
+    int outcode = cli.Process();
+
+    return outcode;
+}
