@@ -1,31 +1,3 @@
-                         Implementation of the papers
-
-        "Discriminatively Trained And-Or Tree Model for Object Detection"
-        CVPR, 2013.
-
-        "Online Object Tracking, Learning and Parsing with And-Or Graphs"
-        CVPR, 2014.
-
-        "Modeling Occlusion by Discriminative AND-OR Structures"
-        ICCV, 2013
-
-        "Learning Near-Optimal Cost-Sensitive Decision Policies for Object Detection"
-        ICCV, 2013
-
-        "Integrating Context and Occlusion for Car Detection by Hierarchical And-Or Model"
-        ECCV, 2014
-
-Copyright (c) 2014 Center for Vision, Cognition, Learning and Art at UCLA <http://vcla.stat.ucla.edu/>
-            Written by Matt Tianfu Wu (primary contact) <tfwu@stat.ucla.edu> 
-                       Xi Song                          <xsong.lhi@gmail.com> (object detection module)
-                       Yang Lu                          <ylu@stat.ucla.edu>   (tracking module)
-                       Bo Li                            <boli.lhi@gmail.com>  (occlusion module)
-                       Matt Tianfu Wu                                         (decision policy)
-
-
-
-
-
                                  SYSTEM ENVIRONMENT
 
 Although RGM (it stands for Reconfigurable Grammar Model) is wriiten for cross-plathform use, 
