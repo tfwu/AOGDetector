@@ -12,9 +12,7 @@ Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <
         Bo Li                            <boli.lhi@gmail.com>  (occlusion module),                      
 
 ## Code Release Log
-
      10-14-2014: Release detection code  (full code will be released in future)                    
-
 
 ## MODULE 1: object detection 
 
@@ -24,25 +22,32 @@ Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <
 ### VOC Testing
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
   
-  Run:   Entry vocEval <PATH_To_voc_config_xml>,
+  Run:   Entry vocEval PATH_To_voc_config_xml,
   
   e.g.,  Entry vocEval /home/tfwu/Code/RGM/config/voc_config.xml
 
 ### DetectionInASingleImage
-  Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
-  Run:   Entry detect <PATH_To_voc_config_xml>,
+  Use Terminal and cd to the PATH_TO_Build/bin where the executable "Entry" is built,
+  
+  Run:   Entry detect PATH_To_voc_config_xml,
+  
   e.g.,  Entry detect /home/tfwu/Code/RGM/config/voc_config.xml
 
 ### BatchDetectionInDirectory
-  Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
-  Run:   Entry detectBatch <PATH_To_voc_config_xml>, 
+  Use Terminal and cd to the PATH_TO_Build/bin where the executable "Entry" is built,
+  
+  Run:   Entry detectBatch PATH_To_voc_config_xml, 
+  
   e.g.,  Entry detectBatch /home/tfwu/Code/RGM/config/voc_config.xml  
 
 ### ConvertVOCRel5Model
   Use Terminal and cd to the <PATH_TO_Build>/bin where the executable "Entry" is built,
-  Run:   Entry cvtVOCRel5Model <PATH_To_VOCRel5_Model_Mat_File>, 
+  
+  Run:   Entry cvtVOCRel5Model PATH_To_VOCRel5_Model_Mat_File,
+  
   e.g.,  Entry cvtVOCRel5Model /home/tfwu/Code/RGM/externalModels/VOC2007/bicycle_final.mat,
-  The converted model will be saved (e.g., /home/tfwu/Code/RGM/data/bicycle_final.mat.bin),
-  which you can used to test detection.
-  Note: before using this to convert a matlab model trained using VOC-Release 5 from Dr. Ross Girshick, 
-        please use <PATH_TO_RGM_Source_Code>/matlab/convertVOCR5.m to add a "DFS" field to the model structure.
+  
+  The converted model will be saved (e.g., /home/tfwu/Code/RGM/data/bicycle_final.mat.bin) which can be used to test detection.
+  
+  Note: Before using this to convert a matlab model trained using VOC-Release 5 by Dr. Ross Girshick, 
+        please use PATH_TO_RGM_Source_Code/matlab/convertVOCR5.m to add a "DFS" field to the model structure.
