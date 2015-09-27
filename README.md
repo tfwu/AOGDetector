@@ -1,5 +1,5 @@
 # AOGDetector
-                          Implementation of the papers
+                          ## Implementation of the papers
 
         "Discriminatively Trained And-Or Tree Model for Object Detection"
         CVPR, 2013.        
