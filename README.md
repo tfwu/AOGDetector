@@ -4,7 +4,7 @@
         Xi Song, Tianfu Wu, Yunde Jia and Song-Chun Zhu, "Discriminatively Trained And-Or Tree Model for Object Detection",  In CVPR2013.        
         Bo Li, Wenze Hu, Tianfu Wu and Song-Chun Zhu, "Modeling Occlusion by Discriminative AND-OR Structures", In ICCV2013        
         Bo Li, Tianfu Wu and Song-Chun Zhu, "Integrating Context and Occlusion for Car Detection by Hierarchical And-Or Model", In ECCV2014
-        Tianfu Wu, Bo Li and Song-Chun Zhu, "Learning And-Or Models to Represent Context and Occlusion for Car Detection and Viewpoint Estimation",  arXiv 1501.07359, TPAMI(under major revision), 2015
+        Tianfu Wu, Bo Li and Song-Chun Zhu, "Learning And-Or Models to Represent Context and Occlusion for Car Detection and Viewpoint Estimation",  TPAMI, 2015 (arXiv 1501.07359)
 
 Copyright (c) 2014 Center for Vision, Cognition, Learning and Autonomy at UCLA <http://vcla.stat.ucla.edu/>,
         
